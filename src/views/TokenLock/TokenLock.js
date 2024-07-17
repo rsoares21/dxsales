@@ -52,7 +52,6 @@ import Primary from "../../components/Typography/Primary.js";
 import Info from "../../components/Typography/Info.js";
 
 //Web3 Interface
-import Web3 from 'web3';
 import { useWeb3React } from '@web3-react/core';
 import { Contract, ethers, BigNumber as EthersBigNumber } from 'ethers';
 import coinAddressValidator from 'coin-address-validator';

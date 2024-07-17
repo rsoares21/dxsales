@@ -27,7 +27,6 @@ import { utils } from "ethers";
 import InputLabel from "@material-ui/core/InputLabel";
 import isValidAddress from "../../components/AddressValidator.js";
 import { useState, useEffect } from 'react';
-import Web3 from 'web3';
 import { useWeb3React } from '@web3-react/core';
 import { Contract, ethers, BigNumber as EthersBigNumber } from 'ethers';
 import { getDefaultProvider } from "../../components/WalletConnector.js";

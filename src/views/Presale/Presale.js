@@ -49,7 +49,6 @@ import SendIcon from '@mui/icons-material/Send';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 //Web3 Interface
-import Web3 from 'web3';
 import { useWeb3React } from '@web3-react/core';
 import { Contract, ethers, BigNumber as EthersBigNumber } from 'ethers';
 import coinAddressValidator from 'coin-address-validator';

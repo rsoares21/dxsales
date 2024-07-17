@@ -5,7 +5,6 @@ import { InjectedConnector, NoEthereumProviderError,
 import { UserRejectedRequestError as UserRejectedRequestErrorWalletConnect, WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { BscConnector,  NoBscProviderError } from '@binance-chain/bsc-connector';
 import { ethers } from "ethers";
-import Web3 from "web3";
 
 let netid = 0;//0 ropsten, 1 bsc
 let provider = null;
@@ -41,7 +40,7 @@ const defaultRopstenconfig = {
   nodetimeout:10000,
 };
 
-function web3ProviderFrom(endpoint, config) {
+/*function web3ProviderFrom(endpoint, config) { //Ropsten is gone
     const ethConfig = Object.assign(defaultRopstenconfig, config || {});
   
     const providerClass = endpoint.includes("wss")
@@ -54,14 +53,13 @@ function web3ProviderFrom(endpoint, config) {
     return new providerClass(endpoint, {
       timeout: ethConfig.nodetimeout,
     });
-  }
+  }*/
 
 export function getDefaultProvider() {
   if (!provider) {
-    provider = new ethers.providers.Web3Provider(
-      web3ProviderFrom(netlist[netid].rpcurl),
-      netlist[netid].chaind
-    );
+    //provider = new ethers.providers.Web3Provider(web3ProviderFrom(netlist[netid].rpcurl),netlist[netid].chaind);
+    provider = new ethers.providers.JsonRpcProvider(netlist[netid].rpcurl);
+
   }
 
   return provider;
@@ -71,14 +69,10 @@ export function setNet(id) {
   netid = id;
 
   walletconnect = new WalletConnectConnector({
-    rpc: { [netlist[netid].chaind]: netlist[netid].rpcurl},
-    // http: { [netlist[netid].chaind]: netlist[netid].rpcurl },
-    // infuraId:
+    rpc: { [netlist[netid].chaind]: netlist[netid].rpcurl },
     qrcode: true,
     pollingInterval: 12000,
   });
-
-  // console.log("wallet connect", walletconnect);
 
   injected = new InjectedConnector({
     supportedChainIds: [netlist[netid].chaind],
@@ -95,43 +89,29 @@ export function useWalletConnector () {
   const [provider, setProvider] = useState({});
 
   const setupNetwork = async () => {
-    // console.log("setup")
-    const provider = window.ethereum
-    // console.log(provider)
-    if (provider) {
+    const { ethereum } = window;
+    if (ethereum) {
       try {
-        await provider.request({
+        await ethereum.request({
           method: 'wallet_switchEthereumChain',
-          params: [
-            {
-              chainId: `0x${netlist[netid].chaind.toString(16)}`,
-              // chainName: netlist[netid].chainname,
-              // nativeCurrency: {
-              //   name: netlist[netid].chainnetname,
-              //   symbol: netlist[netid].symbol,
-              //   decimals: netlist[netid].decimals,
-              // },
-              // rpcUrls: [`${netlist[netid].rpcurl}`],
-              // blockExplorerUrls: [`${netlist[netid].blockurl}`],
-            },
-          ],
-        })
-
-        setProvider(provider);
-        return true
+          params: [{ chainId: ethers.utils.hexlify(netlist[netid].chaind) }],
+        });
+        setProvider(new ethers.providers.Web3Provider(ethereum));
+        return true;
       } catch (error) {
-        return false
+        console.error(error);
+        return false;
       }
     } else {
-      console.error("Can't setup the Default Network network on metamask because window.ethereum is undefined")
-      return false
+      console.error("Can't setup the network because window.ethereum is undefined");
+      return false;
     }
-  }
+  };
 
   const loginMetamask = async () => {
-    // console.log("metamask")
+    console.log("metamask")
     // console.log(account)
-    // console.log(injected)
+    console.log(injected)
     loginWallet(injected)
     // loginWallet(injected)
   }
